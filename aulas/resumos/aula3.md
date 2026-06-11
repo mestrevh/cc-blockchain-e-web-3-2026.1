@@ -51,30 +51,25 @@
 
 ### ❓ 6. Questões de Autoavaliação (Estilo Flashcard)
 * **Pergunta 1:** Qual é a função da Chave Pública (Endereço) e da Chave Privada em uma rede Blockchain?
-  ```html
   <details>
     <summary><b>Ver Resposta</b></summary>
     A Chave Pública atua como um endereço ou identificador para recebimentos, visível publicamente. A Chave Privada atua como a senha que confere posse sob a conta, permitindo que o usuário assine e autorize o gasto dos saldos ou a interação com contratos inteligentes.
   </details>
-  ```
+
 * **Pergunta 2:** O que torna a blockchain imutável ao longo do tempo? Qual componente do bloco é fundamental para isso?
-  ```html
   <details>
     <summary><b>Ver Resposta</b></summary>
     O componente fundamental é o "Hash do Bloco Anterior" (Parent Hash). Ele cria um elo criptográfico sequencial; se os dados de qualquer bloco antigo forem alterados, seu hash será completamente modificado, quebrando o elo com o bloco seguinte e invalidando a fraude perante o restante da rede.
   </details>
-  ```
+
 * **Pergunta 3:** Como funciona a dicotomia entre transparência total e privacidade em blockchains públicas?
-  ```html
   <details>
     <summary><b>Ver Resposta</b></summary>
     A rede é 100% transparente pois permite que qualquer pessoa rastreie o saldo e as transações de todos os endereços via Exploradores de Blocos. Contudo, há privacidade na forma de pseudo-anonimato, pois a criação de um endereço não exige vínculo formal e obrigatório com os dados reais de um indivíduo (como nome ou CPF).
   </details>
-  ```
+
 * **Pergunta 4:** O que é um Replay Attack (Ataque de Reprodução) e qual a técnica usada para mitigá-lo nas assinaturas de transações?
-  ```html
   <details>
     <summary><b>Ver Resposta</b></summary>
     O ataque ocorre quando um indivíduo intercepta a comunicação de uma transação perfeitamente válida e tenta reenviá-la à rede para executá-la repetidas vezes em proveito próprio. A mitigação é feita adicionando um carimbo de tempo (Timestamp) ou um número sequencial único (Nonce) no momento da assinatura, tornando qualquer cópia duplicada inválida e recusada pela rede.
   </details>
-  ```

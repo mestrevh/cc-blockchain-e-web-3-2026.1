@@ -62,33 +62,25 @@
 ### ❓ 6. Questões de Autoavaliação (Estilo Flashcard)
 
 * **Pergunta 1: Como o Efeito Avalanche auxilia na integridade de dados salvos em uma Blockchain?**
-  ```html
   <details>
     <summary><b>Ver Resposta</b></summary>
     O Efeito Avalanche garante que qualquer mínima alteração de dados em um bloco anterior mude completamente o hash resultante do bloco. Como cada bloco subsequente aponta para o hash do bloco anterior, toda a cadeia a partir do ponto alterado é invalidada imediatamente. Isso impede que dados antigos sejam editados de forma fraudulenta sem que a rede perceba.
   </details>
-  ```
 
 * **Pergunta 2: Qual é a distinção de governança entre a blockchain de consórcio e a blockchain privada?**
-  ```html
   <details>
     <summary><b>Ver Resposta</b></summary>
     Na blockchain privada, uma única organização controla totalmente a governança, as regras de negócios e a validação das transações. Na blockchain de consórcio, a validação e a governança são distribuídas de forma compartilhada entre múltiplas organizações pré-selecionadas (ex. empresas de um setor e agências reguladoras), evitando a centralização em um único participante.
   </details>
-  ```
 
 * **Pergunta 3: O que é o Checksum e qual é a sua limitação se a fonte de validação estiver comprometida?**
-  ```html
   <details>
     <summary><b>Ver Resposta</b></summary>
     O Checksum é a soma de verificação por hash que valida se um arquivo não foi modificado. A limitação ocorre se a fonte que exibe o checksum (como o site de download) estiver comprometida ou sob ataque de falsificação (ex. DNS spoofing). O hacker pode alterar tanto o arquivo quanto o hash exibido na página, enganando o usuário. Por isso, a validação exige também a verificação de certificados SSL/TLS da página web.
   </details>
-  ```
 
 * **Pergunta 4: Por que a Hedera Hashgraph consegue atingir mais de 10.000 TPS enquanto a blockchain do Bitcoin processa cerca de 3-7 transações por segundo?**
-  ```html
   <details>
     <summary><b>Ver Resposta</b></summary>
     O Bitcoin processa transações de forma sequencial e em blocos lineares e rígidos, gerando filas de espera de processamento (serialização). A Hedera Hashgraph usa uma estrutura em grafo (DAG) sem formação de blocos rígidos, o que permite processar e validar transações em paralelo de forma contínua usando o consenso distribuído de "fofoca sobre fofoca" (gossip about gossip).
   </details>
-  ```
