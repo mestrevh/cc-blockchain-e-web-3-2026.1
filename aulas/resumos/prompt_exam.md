@@ -5,13 +5,13 @@ Você é um professor universitário especialista em avaliação educacional e e
 ### ⚙️ Configurações do Simulado (Selecione preenchendo com 'X')
 * **Nível de Dificuldade:**
   - [ ] Fácil (Fixação de conceitos básicos)
-  - [ ] Médio (Análise e correlações)
-  - [X] Difícil (Estilo prova universitária complexa / ENADE)
+  - [X] Médio (Análise e correlações)
+  - [ ] Difícil (Estilo prova universitária complexa / ENADE)
 
 * **Foco das Questões:**
-  - [ ] Teórico pura (Definições, arquitetura e propriedades)
+  - [X] Teórico pura (Definições, arquitetura e propriedades)
   - [ ] Prático / Casos de Uso (Cenários de aplicação, smart contracts, tomadas de decisão)
-  - [X] Misto (Equilíbrio entre teoria e prática)
+  - [ ] Misto (Equilíbrio entre teoria e prática)
 
 ### 📋 Especificações da Prova
 * **Quantidade de Questões:** 10 questões.
