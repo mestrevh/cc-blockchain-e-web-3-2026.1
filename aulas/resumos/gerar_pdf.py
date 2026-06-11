@@ -1,12 +1,10 @@
 import os
 import re
-import subprocess
-import shutil
+from markdown_pdf import MarkdownPdf, Section
 
 def main():
     script_dir = os.path.dirname(os.path.abspath(__file__))
     output_pdf = os.path.join(script_dir, "resumos_completos.pdf")
-    temp_md = os.path.join(script_dir, "temp_combined_resumos.md")
     
     print("Iniciando a compilação dos resumos...")
     
@@ -26,7 +24,8 @@ def main():
     print(f"Arquivos encontrados para compilação: {', '.join(files)}")
     
     # 2. Folha de estilo CSS personalizada para deixar o PDF com aspecto premium
-    css_styles = """<style>
+    # Usando CSS puro sem tags <style> para o markdown-pdf
+    css_styles = """
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap');
     
     body {
@@ -39,7 +38,6 @@ def main():
     h1, h2, h3, h4 {
         color: #1a365d;
         font-weight: 600;
-        page-break-inside: avoid;
     }
     
     h1 {
@@ -82,7 +80,6 @@ def main():
         padding: 12px;
         border-radius: 6px;
         overflow: auto;
-        page-break-inside: avoid;
     }
     
     pre code {
@@ -97,7 +94,6 @@ def main():
         width: 100%;
         border-collapse: collapse;
         margin: 15px 0;
-        page-break-inside: avoid;
     }
     
     th, td {
@@ -120,7 +116,6 @@ def main():
         padding: 8px 12px;
         border-radius: 4px;
         margin: 8px 0;
-        page-break-inside: avoid;
     }
     
     summary {
@@ -129,62 +124,35 @@ def main():
         cursor: pointer;
         outline: none;
     }
-    
-    summary::-webkit-details-marker {
-        color: #4299e1;
-    }
-    
-    /* Configuração de quebra de página */
-    .page-break {
-        page-break-after: always;
-        break-after: page;
-    }
-    </style>
     """
     
-    # 3. Une todos os arquivos markdown inserindo quebras de página
-    combined_content = css_styles + "\n"
-    combined_content += "# Resumos Consolidados - Blockchain e Web 3.0\n"
-    combined_content += "*Este documento unifica os resumos de estudo das aulas 1 a 14.*\n\n"
-    combined_content += "<div class='page-break'></div>\n\n"
+    # 3. Cria o conversor MarkdownPdf
+    pdf = MarkdownPdf(toc_level=2)
     
-    for index, file in enumerate(files):
+    # Adiciona a capa/título como primeira seção
+    cover_text = "# Resumos Consolidados - Blockchain e Web 3.0\n\n*Este documento unifica os resumos de estudo das aulas 1 a 14.*\n"
+    pdf.add_section(Section(cover_text), user_css=css_styles)
+    
+    # 4. Adiciona cada arquivo markdown como uma seção individual (gera quebra de página automática)
+    for file in files:
         file_path = os.path.join(script_dir, file)
         with open(file_path, "r", encoding="utf-8") as f:
             file_data = f.read()
             
-        # Adiciona o título da aula e seu conteúdo
-        combined_content += f"# Aula {extract_number(file)}\n\n"
-        combined_content += file_data + "\n\n"
+        aula_num = extract_number(file)
+        # Prefixa o conteúdo com o título da Aula
+        section_text = f"# Aula {aula_num}\n\n{file_data}"
         
-        # Não adiciona quebra de página após o último arquivo
-        if index < len(files) - 1:
-            combined_content += "<div class='page-break'></div>\n\n"
-            
-    with open(temp_md, "w", encoding="utf-8") as f:
-        f.write(combined_content)
+        pdf.add_section(Section(section_text), user_css=css_styles)
+        print(f"Adicionada: {file}")
         
-    # 4. Verifica se o npx / Node está disponível para rodar o conversor
-    if not shutil.which("npx"):
-        print("[ERRO] O comando 'npx' não foi encontrado no sistema.")
-        print("Certifique-se de que o Node.js está instalado e configurado no PATH.")
-        return
-        
-    print("Gerando PDF usando o md-to-pdf...")
+    print("Gerando o arquivo PDF...")
     try:
-        # Executa md-to-pdf passando o arquivo temporário
-        comando = ["npx", "--yes", "md-to-pdf", temp_md, "--output", output_pdf]
-        resultado = subprocess.run(comando, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        
+        pdf.save(output_pdf)
         print(f"\n[SUCESSO] PDF gerado com êxito em:\n{output_pdf}")
-        
-    except subprocess.CalledProcessError as e:
-        print(f"\n[ERRO] Ocorreu uma falha ao executar a conversão para PDF.")
-        print(f"Detalhes do erro:\n{e.stderr.decode('utf-8', errors='ignore')}")
-    finally:
-        # 5. Limpa o arquivo markdown temporário
-        if os.path.exists(temp_md):
-            os.remove(temp_md)
+    except Exception as e:
+        print(f"\n[ERRO] Ocorreu uma falha ao gerar o PDF.")
+        print(f"Detalhes do erro: {e}")
 
 if __name__ == "__main__":
     main()
