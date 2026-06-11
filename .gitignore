@@ -1,4 +1,5 @@
 .vscode/
+.venv/
 
 # Ignore vídeo files in the aulas/videos folder
 aulas/videos/*.mp4
