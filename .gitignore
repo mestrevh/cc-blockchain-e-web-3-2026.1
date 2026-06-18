@@ -1,5 +1,8 @@
+# configurations
 .vscode/
 .venv/
+.agents/
+
 
 # Ignore vídeo files in the aulas/videos folder
 aulas/videos/*.mp4
@@ -7,3 +10,7 @@ aulas/videos/*.mkv
 aulas/videos/*.webm
 aulas/download_class/drive.google.com_cookies.txt
 aulas/download_class/cookies.txt
+
+# Node files
+node_modules/
+package-lock.json
