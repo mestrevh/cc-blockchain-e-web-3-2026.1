@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hello Web3</title>
+  </head>
+  <body>
+    <main>
+      <h1>Hello Web3</h1>
+      <p>Hardhat local · MetaMask</p>
+
+      <section>
+        <!-- Este é o botão que vai chamar a MetaMask -->
+        <button type="button" id="btn-connect">Connect Wallet</button>
+        <p id="wallet"></p>
+      </section>
+
+      <section id="section-site-network" hidden>
+        <p>Troca de Rede Automática</p>
+        <button type="button" id="btn-add-network">
+          Mudar para Hardhat local
+        </button>
+      </section>
+    </main>
+
+    <!-- Importando a biblioteca ethers.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+    
+    <!-- O nosso arquivo de lógica que criaremos a seguir -->
+    <script src="app.js"></script>
+  </body>
+</html>
