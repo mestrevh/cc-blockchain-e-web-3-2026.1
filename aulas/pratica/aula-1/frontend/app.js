@@ -28,7 +28,7 @@ btnConnect.addEventListener('click', async () => {
 // Parte para verificar a troca de rede
 const btnAddNetwork = document.getElementById("btn-add-network");
 
-btnAddNetwork.document.addEventListener('click', async () => {
+btnAddNetwork.addEventListener('click', async () => {
     try {
         await window.ethereum.request({
             method: 'wallet_switchEthereumChain',
@@ -63,4 +63,29 @@ btnAddNetwork.document.addEventListener('click', async () => {
             console.log("Ocorreu um erro deconhecido", error);
         }
     }
+});
+
+const contractAddress = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
+const abi = [
+    "function getMessage() public pure returns (string memory)"
+];
+
+const btnMessage = document.getElementById("btn-get-message");
+const messageTxt = document.getElementById("message-text");
+
+btnMessage.addEventListener('click', async () => {
+
+    try {
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const contract = new ethers.Contract(contractAddress, abi, provider);
+        
+        const message = await contract.getMessage();
+
+        messageTxt.innerText = message;
+
+    } catch (error) {
+        console.error("Erro ao ler a mensagem: ", error);
+        messageTxt.innerText = "Erro ao ler. Verifique o console.";
+    }
+
 });

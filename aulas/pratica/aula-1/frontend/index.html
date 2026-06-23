@@ -22,11 +22,21 @@
           Mudar para Hardhat local
         </button>
       </section>
+
+      <section id="section-contract" style="margin-top: 20px;">
+        <p>
+          Interação com o contrato
+        </p>
+        <button type="button" id="btn-get-message">
+          ler mensagem gratuita
+        </button>
+        <p id="message-text" style="font-weight: bold; color: green;"></p>
+      </section>
     </main>
 
     <!-- Importando a biblioteca ethers.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
-    
+
     <!-- O nosso arquivo de lógica que criaremos a seguir -->
     <script src="app.js"></script>
   </body>

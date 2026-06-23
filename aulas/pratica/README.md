@@ -105,3 +105,5 @@ btnConnect.addEventListener('click', async () => {
 ```
 
 Basicamente esse código em `js` é responsável pela conexão dentro do window.ethereum (onde fica a metamask), após a conexão deve aparecer a chave publica. Isso aconteceu!!!
+
+### Aula 10
