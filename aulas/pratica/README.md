@@ -107,3 +107,43 @@ btnConnect.addEventListener('click', async () => {
 Basicamente esse código em `js` é responsável pela conexão dentro do window.ethereum (onde fica a metamask), após a conexão deve aparecer a chave publica. Isso aconteceu!!!
 
 ### Aula 10
+
+Criando o primeiro contrato inteligente dentro do diretório `contracts/`
+
+```solidity
+pragma solidity ^0.8.20;
+
+contract HelloWorld {
+
+    function getMessage() public pure returns (string memory) {
+        return unicode"hello world from blokchain";
+    }
+}
+```
+
+Para compilar esse contrato e deixar na rede local da blockchain é utilizado o comando abaixo no terminal:
+
+```bash
+npm run compile
+```
+
+A partir desse momento temos o `deploy.js`:
+
+```javascript
+async function main() {
+
+    const HelloWorld = await ethers.getContractFactory("HelloWorld");
+    const contract = await HelloWorld.deploy();
+    await contract.waitForDeployment();
+    console.log("Contrato deployado em:", await contract.getAddress());
+}
+
+
+main().catch((error => {
+    console.log(error);
+    process.exitCode = 1;
+}));
+```
+
+Esse deploy serve para conseguimos o endereço de acesso para o contrato na rede local.
+Para acessamos foi feito um botão pegando essa mensagem a partir `ethers.Contract`.
