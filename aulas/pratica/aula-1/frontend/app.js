@@ -65,10 +65,61 @@ btnAddNetwork.addEventListener('click', async () => {
     }
 });
 
-const contractAddress = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
+const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 const abi = [
-    "function getMessage() public pure returns (string memory)"
-];
+    {
+      "inputs": [],
+      "name": "get",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getMessage",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "x",
+          "type": "uint256"
+        }
+      ],
+      "name": "set",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "storedData",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ];
 
 const btnMessage = document.getElementById("btn-get-message");
 const messageTxt = document.getElementById("message-text");
@@ -88,4 +139,30 @@ btnMessage.addEventListener('click', async () => {
         messageTxt.innerText = "Erro ao ler. Verifique o console.";
     }
 
+});
+
+const btnGetX = document.getElementById('btn-get-x');
+const msgX = document.getElementById('get-x');
+
+btnGetX.addEventListener('click', async () => {
+    try {
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
+        const contract = new ethers.Contract(contractAddress, abi, signer);
+
+        console.log("Enviando transação...");
+        const tx = await contract.set(10);
+        await tx.wait();
+
+        console.log("Transação confirmada!");
+
+        const message = await contract.get();
+
+
+        msgX.innerText = "O valor de X é: " + message;
+
+    } catch (error) {
+        console.error("Erro ao ler o valor de x: ", error);
+        msgX.innerText = "Erro ao ler. Verifique o console.";
+    }
 });

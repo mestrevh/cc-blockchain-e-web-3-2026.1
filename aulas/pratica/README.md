@@ -147,3 +147,29 @@ main().catch((error => {
 
 Esse deploy serve para conseguimos o endereço de acesso para o contrato na rede local.
 Para acessamos foi feito um botão pegando essa mensagem a partir `ethers.Contract`.
+
+### Aula 11
+
+Explorando o solidity, como na blockchain só possui 2 operações: criar e ler, existe uma diferença em utilizar o `pure` e `view`. Pure está responsável apenas por ser um codigo sem alterar e nem ler algo do smart contract, ou seja, sempre é estatico e não necessariamente está na blockchain. Já o view é responsável por ler e não pode alterar o estado do smart contract.
+
+Código alterado:
+
+```solidity
+uint256 public storedData;
+
+function set(uint256 x) public {
+  storedData = x;
+}
+
+function get() public view returns (uint256) {
+  return storedData;
+}
+```
+
+Importante, toda alteração no smart contract é preciso rodar novamente o comando abaixo:
+
+```bash
+npm run compile
+```
+
+Importante mencionar que para o `stateMutability` no [name].sol/[name].json
