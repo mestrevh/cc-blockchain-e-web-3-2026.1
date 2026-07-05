@@ -1,15 +1,9 @@
 [project]
-name = "download-class"
+name = "ai"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
-    "markdown-pdf>=1.13.2",
-    "yt-dlp",
-]
-
-[tool.uv.workspace]
-members = [
-    "projeto/ai",
+    "requests>=2.34.2",
 ]
