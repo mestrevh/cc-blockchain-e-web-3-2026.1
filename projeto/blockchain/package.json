@@ -1,0 +1,16 @@
+{
+  "name": "surveillance-audit-blockchain",
+  "version": "1.0.0",
+  "description": "Camada de Blockchain do sistema de auditoria imutavel para vigilancia com reconhecimento facial (contrato SurveillanceAudit)",
+  "scripts": {
+    "node": "hardhat node",
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy:localhost": "hardhat run scripts/deploy.js --network localhost"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "hardhat": "^2.22.0"
+  }
+}
