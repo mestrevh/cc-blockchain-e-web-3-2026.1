@@ -2,8 +2,8 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "/home/victorhugo/cc-blockchain-e-web-3-2026.1/aulas/pratica/aula-1/contracts/HelloWorld.sol": {
-      "lastModificationDate": 1782234564900,
-      "contentHash": "230a5f269207ef11532a28e48f554163",
+      "lastModificationDate": 1782239503288,
+      "contentHash": "2a1be0c514b175a1dbe1175748a35584",
       "sourceName": "contracts/HelloWorld.sol",
       "solcConfig": {
         "version": "0.8.20",
