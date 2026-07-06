@@ -20,6 +20,7 @@ Para testar a arquitetura ponta a ponta localmente, você precisará abrir **4 t
 Nós precisamos de uma rede Ethereum local rodando para aceitar nossos contratos.
 ```bash
 cd projeto/blockchain
+npm i
 npx hardhat node
 ```
 *(Deixe este terminal aberto. Ele exibirá várias contas e chaves privadas falsas de teste. Copie uma chave privada "Account #0" para o `.env` do Backend caso necessário).*
@@ -29,6 +30,7 @@ O Backend é a ponte segura que possui acesso de escrita à blockchain.
 ```bash
 cd projeto/backend
 # Certifique-se de configurar as variáveis de ambiente (.env) necessárias
+npm i
 npm run start:dev
 ```
 *(Ele ficará ouvindo requisições na porta 3000).*
