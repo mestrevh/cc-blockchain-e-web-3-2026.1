@@ -25,8 +25,15 @@ npx hardhat node
 ```
 *(Deixe este terminal aberto. Ele exibirá várias contas e chaves privadas falsas de teste. Copie uma chave privada "Account #0" para o `.env` do Backend caso necessário).*
 
+### Terminal 1.5: Fazendo o Deploy
+Abra uma NOVA ABA ou terminal, deixe o Terminal 1 rodando e faça o deploy:
+```bash
+cd projeto/blockchain
+npx hardhat run scripts/deploy.js --network localhost
+```
+
 ### Terminal 2: Inicializando a API Backend
-O Backend é a ponte segura que possui acesso de escrita à blockchain.
+O Backend é a ponte segura que possui acesso de escrita à blockchain. Verifique o arquivo `.env` para colocar os valores corretos ao fazer o deploy
 ```bash
 cd projeto/backend
 # Certifique-se de configurar as variáveis de ambiente (.env) necessárias
