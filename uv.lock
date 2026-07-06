@@ -2,6 +2,23 @@ version = 1
 revision = 3
 requires-python = ">=3.14"
 
+[manifest]
+members = [
+    "ai",
+    "download-class",
+]
+
+[[package]]
+name = "ai"
+version = "0.1.0"
+source = { virtual = "projeto/ai" }
+dependencies = [
+    { name = "requests" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "requests", specifier = ">=2.34.2" }]
+
 [[package]]
 name = "certifi"
 version = "2026.5.20"
