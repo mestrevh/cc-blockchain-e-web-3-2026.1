@@ -14,6 +14,7 @@ const IdentitiesList = () => {
   const [doc, setDoc] = useState('');
   const [photoBase64, setPhotoBase64] = useState('');
   const [fileName, setFileName] = useState('');
+  const [fileKey, setFileKey] = useState(Date.now());
   const [isResident, setIsResident] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -88,10 +89,21 @@ const IdentitiesList = () => {
       setDoc('');
       setPhotoBase64('');
       setFileName('');
+      setFileKey(Date.now()); // Força a recriação do input file para limpar o cache do navegador
       fetchIdentities(); // Refresh list
     } catch (error) {
       console.error('Erro ao registrar:', error);
-      alert('Erro na comunicação com a Blockchain ou transação rejeitada.');
+      // Tenta extrair a mensagem de erro específica do Smart Contract (ex: IdentityAlreadyExists)
+      let reason = "Erro na comunicação com a Blockchain ou transação rejeitada.";
+      if (error.reason) reason = error.reason;
+      else if (error.data && error.data.message) reason = error.data.message;
+      else if (error.message) reason = error.message;
+      
+      if (reason.includes("IdentityAlreadyExists")) {
+        alert("Erro: Este Documento (CPF/RG) já está cadastrado para sua carteira!");
+      } else {
+        alert(`Erro na transação:\n${reason}`);
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -119,7 +131,7 @@ const IdentitiesList = () => {
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
               <label style={styles.fileUploadBtn}>
                 📸 Selecionar Arquivo
-                <input required type="file" accept="image/*" onChange={handleFileChange} style={{ display: 'none' }} />
+                <input key={fileKey} required type="file" accept="image/*" onChange={handleFileChange} style={{ display: 'none' }} />
               </label>
               <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
                 {fileName ? fileName : 'Nenhum arquivo selecionado'}
