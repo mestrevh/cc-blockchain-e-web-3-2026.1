@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useWallet } from '../contexts/WalletContext';
 
 const formatTimestamp = (unixSeconds) => {
   if (!unixSeconds) return 'N/A';
@@ -7,22 +8,48 @@ const formatTimestamp = (unixSeconds) => {
 };
 
 const AlertTable = () => {
+  const { account } = useWallet();
   const [alerts, setAlerts] = useState([]);
+  const [identities, setIdentities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    const fetchIdentities = async () => {
+      if (!account) return [];
+      try {
+        const response = await fetch(`http://localhost:3000/identities/wallet/${account}`);
+        if (response.ok) {
+          const data = await response.json();
+          const hashes = data.map(id => id.identityHash);
+          setIdentities(hashes);
+          return hashes;
+        }
+      } catch (e) {
+        console.error('Erro ao buscar identidades', e);
+      }
+      return [];
+    };
+
     const fetchAlerts = async (isBackgroundRefresh = false) => {
       try {
+        const userHashes = await fetchIdentities();
+
         const response = await fetch('http://localhost:3000/alerts');
         if (!response.ok) {
           throw new Error('Falha na resposta do servidor da API');
         }
         const data = await response.json();
+        
+        // Filtra os alertas para focar apenas nas identidades do usuario (se ele tiver alguma)
+        // Se a carteira nao tiver identidades cadastradas, exibe tudo ou nada?
+        // A regra diz: "Auditoria Imutavel deve focar apenas nos contratos adicionados pelo usuario"
+        const filteredData = data.filter(alert => userHashes.includes(alert.identityHash));
+
         // Garante que os registros mais recentes (maior ID) fiquem no topo da tabela
-        const sortedData = data.sort((a, b) => b.id - a.id);
+        const sortedData = filteredData.sort((a, b) => b.id - a.id);
         setAlerts(sortedData);
-        setError(null); // Limpa o erro se a conexão voltar
+        setError(null);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -42,7 +69,7 @@ const AlertTable = () => {
 
     // Cleanup para evitar memory leak quando o componente for desmontado
     return () => clearInterval(intervalId);
-  }, []);
+  }, [account]);
 
   if (loading) {
     return (
