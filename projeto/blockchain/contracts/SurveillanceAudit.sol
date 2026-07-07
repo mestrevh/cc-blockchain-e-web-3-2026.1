@@ -61,6 +61,7 @@ contract SurveillanceAudit {
         uint256 timestamp;
         string alertType;
         bytes32 imageHash;
+        bytes32 identityHash; // Hash do contrato de identidade associado (se houver)
         address registeredBy;
         uint256 blockTimestamp;
     }
@@ -101,6 +102,7 @@ contract SurveillanceAudit {
         string alertType,
         bytes32 imageHash,
         uint256 timestamp,
+        bytes32 identityHash,
         address indexed registeredBy,
         uint256 blockTimestamp
     );
@@ -176,7 +178,8 @@ contract SurveillanceAudit {
         string calldata cameraId,
         uint256 timestamp,
         string calldata alertType,
-        bytes32 imageHash
+        bytes32 imageHash,
+        bytes32 identityHash
     ) external onlyAuthorized returns (uint256 id) {
         if (bytes(cameraId).length == 0) revert EmptyCameraId();
         if (bytes(alertType).length == 0) revert EmptyAlertType();
@@ -192,6 +195,7 @@ contract SurveillanceAudit {
             timestamp: timestamp,
             alertType: alertType,
             imageHash: imageHash,
+            identityHash: identityHash,
             registeredBy: msg.sender,
             blockTimestamp: block.timestamp
         });
@@ -204,6 +208,7 @@ contract SurveillanceAudit {
             alertType,
             imageHash,
             timestamp,
+            identityHash,
             msg.sender,
             block.timestamp
         );
