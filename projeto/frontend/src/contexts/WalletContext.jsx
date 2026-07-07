@@ -29,6 +29,42 @@ export const WalletProvider = ({ children }) => {
     }
   };
 
+  const HARDHAT_NETWORK_ID = '0x7a69'; // 31337 em Hexadecimal
+
+  const switchToLocalNetwork = async () => {
+    try {
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: HARDHAT_NETWORK_ID }],
+      });
+    } catch (switchError) {
+      // Código 4902 indica que a rede ainda não foi adicionada no MetaMask
+      if (switchError.code === 4902) {
+        try {
+          await window.ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [
+              {
+                chainId: HARDHAT_NETWORK_ID,
+                chainName: 'Hardhat Localhost',
+                rpcUrls: ['http://127.0.0.1:8545'],
+                nativeCurrency: {
+                  name: 'Ethereum',
+                  symbol: 'ETH',
+                  decimals: 18,
+                },
+              },
+            ],
+          });
+        } catch (addError) {
+          console.error('Erro ao adicionar a rede Hardhat:', addError);
+        }
+      } else {
+        console.error('Erro ao trocar de rede:', switchError);
+      }
+    }
+  };
+
   const connectWallet = async () => {
     if (!window.ethereum) {
       alert('MetaMask não encontrada! Instale a extensão no seu navegador.');
@@ -37,6 +73,7 @@ export const WalletProvider = ({ children }) => {
 
     setIsConnecting(true);
     try {
+      await switchToLocalNetwork();
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
       setupEthers(accounts[0]);
     } catch (error) {
