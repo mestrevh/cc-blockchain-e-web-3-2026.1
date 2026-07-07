@@ -41,10 +41,12 @@ const AlertTable = () => {
         }
         const data = await response.json();
         
-        // Filtra os alertas para focar apenas nas identidades do usuario (se ele tiver alguma)
-        // Se a carteira nao tiver identidades cadastradas, exibe tudo ou nada?
-        // A regra diz: "Auditoria Imutavel deve focar apenas nos contratos adicionados pelo usuario"
-        const filteredData = data.filter(alert => userHashes.includes(alert.identityHash));
+        // Filtra os alertas para focar apenas nas identidades do usuario
+        // Se nao tiver carteira conectada, mostra todos os registros de forma publica
+        let filteredData = data;
+        if (account) {
+          filteredData = data.filter(alert => userHashes.includes(alert.identityHash));
+        }
 
         // Garante que os registros mais recentes (maior ID) fiquem no topo da tabela
         const sortedData = filteredData.sort((a, b) => b.id - a.id);

@@ -1,7 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
 import AlertTable from './components/AlertTable';
-import ConnectWallet from './pages/ConnectWallet';
 import IdentitiesList from './pages/IdentitiesList';
 import { WalletProvider, useWallet } from './contexts/WalletContext';
 
@@ -41,9 +40,15 @@ const Sidebar = () => {
 };
 
 const ProtectedRoute = ({ children }) => {
-  const { account } = useWallet();
+  const { account, connectWallet } = useWallet();
   if (!account) {
-    return <ConnectWallet />;
+    return (
+      <div style={{ textAlign: 'center', padding: '4rem' }}>
+        <h2>Acesso Restrito</h2>
+        <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>Conecte sua carteira para gerenciar identidades.</p>
+        <button onClick={connectWallet} style={styles.logoutBtn}>Conectar MetaMask</button>
+      </div>
+    );
   }
   return children;
 };
@@ -53,7 +58,7 @@ function AppContent() {
 
   return (
     <BrowserRouter>
-      <div style={account ? styles.layoutLoggedIn : styles.layoutLoggedOut}>
+      <div style={styles.layoutLoggedIn}>
         <Sidebar />
         <main style={styles.main}>
           <header className="header" style={styles.header}>
@@ -63,18 +68,31 @@ function AppContent() {
                 Painel Administrativo de Segurança - Registros em Blockchain
               </p>
             </div>
+            {!account && (
+              <button 
+                onClick={connectWallet}
+                style={{
+                  ...styles.logoutBtn,
+                  backgroundColor: 'var(--accent)',
+                  color: '#fff',
+                  border: 'none',
+                  padding: '0.75rem 1.5rem',
+                  fontWeight: 'bold',
+                  width: 'auto'
+                }}
+              >
+                🦊 Conectar Carteira
+              </button>
+            )}
           </header>
           <div style={styles.content}>
             <Routes>
-              <Route path="/connect" element={<ConnectWallet />} />
               <Route 
                 path="/" 
                 element={
-                  <ProtectedRoute>
-                    <section className="glass-panel">
-                      <AlertTable />
-                    </section>
-                  </ProtectedRoute>
+                  <section className="glass-panel">
+                    <AlertTable />
+                  </section>
                 } 
               />
               <Route 
@@ -105,11 +123,6 @@ const styles = {
   layoutLoggedIn: {
     display: 'grid',
     gridTemplateColumns: '250px 1fr',
-    minHeight: '100vh',
-  },
-  layoutLoggedOut: {
-    display: 'flex',
-    flexDirection: 'column',
     minHeight: '100vh',
   },
   sidebar: {
@@ -154,6 +167,9 @@ const styles = {
     flexDirection: 'column',
   },
   header: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     padding: '2rem',
     borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
   },
