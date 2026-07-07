@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Camada de Blockchain do sistema de auditoria imutavel para vigilancia com reconhecimento facial (contrato SurveillanceAudit)",
   "scripts": {
+    "start": "hardhat node & sleep 3 && hardhat run scripts/deploy.js --network localhost && wait",
     "node": "hardhat node",
     "compile": "hardhat compile",
     "test": "hardhat test",
