@@ -12,7 +12,7 @@ const AlertTable = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchAlerts = async () => {
+    const fetchAlerts = async (isBackgroundRefresh = false) => {
       try {
         const response = await fetch('http://localhost:3000/alerts');
         if (!response.ok) {
@@ -20,14 +20,26 @@ const AlertTable = () => {
         }
         const data = await response.json();
         setAlerts(data);
+        setError(null); // Limpa o erro se a conexão voltar
       } catch (err) {
         setError(err.message);
       } finally {
-        setLoading(false);
+        if (!isBackgroundRefresh) {
+          setLoading(false);
+        }
       }
     };
 
-    fetchAlerts();
+    // Chamada inicial (com tela de loading)
+    fetchAlerts(false);
+
+    // Short Polling: recarrega os dados silenciosamente a cada 5 segundos
+    const intervalId = setInterval(() => {
+      fetchAlerts(true);
+    }, 5000);
+
+    // Cleanup para evitar memory leak quando o componente for desmontado
+    return () => clearInterval(intervalId);
   }, []);
 
   if (loading) {
