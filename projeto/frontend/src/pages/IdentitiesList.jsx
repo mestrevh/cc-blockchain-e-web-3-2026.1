@@ -7,10 +7,10 @@ const IdentitiesList = () => {
   const [identities, setIdentities] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Form State (Texto Claro)
   const [name, setName] = useState('');
   const [doc, setDoc] = useState('');
-  const [photo, setPhoto] = useState('');
+  const [photoBase64, setPhotoBase64] = useState('');
+  const [fileName, setFileName] = useState('');
   const [isResident, setIsResident] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -34,18 +34,38 @@ const IdentitiesList = () => {
     fetchIdentities();
   }, [account]);
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFileName(file.name);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        // Pega a string base64 que o FileReader gera
+        setPhotoBase64(reader.result);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setFileName('');
+      setPhotoBase64('');
+    }
+  };
+
   const generateHash = (text) => {
     return ethers.sha256(ethers.toUtf8Bytes(text));
   };
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    if (!photoBase64) {
+      alert("Por favor, selecione uma foto.");
+      return;
+    }
     setIsSubmitting(true);
     
     try {
       const nameHash = generateHash(name);
       const docHash = generateHash(doc);
-      const photoHash = generateHash(photo);
+      const photoHash = generateHash(photoBase64);
 
       const response = await fetch('http://localhost:3000/identities', {
         method: 'POST',
@@ -61,7 +81,8 @@ const IdentitiesList = () => {
         alert('Identidade registrada com sucesso na Blockchain!');
         setName('');
         setDoc('');
-        setPhoto('');
+        setPhotoBase64('');
+        setFileName('');
         fetchIdentities(); // Refresh list
       } else {
         const errorData = await response.json();
@@ -93,8 +114,16 @@ const IdentitiesList = () => {
             <input required type="text" value={doc} onChange={e => setDoc(e.target.value)} placeholder="Ex: 123.456.789-00" style={styles.input} />
           </div>
           <div style={styles.inputGroup}>
-            <label>Evidência Fotográfica (URL ou Base64)</label>
-            <input required type="text" value={photo} onChange={e => setPhoto(e.target.value)} placeholder="URL ou dado da foto" style={styles.input} />
+            <label>Evidência Fotográfica</label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <label style={styles.fileUploadBtn}>
+                📸 Selecionar Arquivo
+                <input required type="file" accept="image/*" onChange={handleFileChange} style={{ display: 'none' }} />
+              </label>
+              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                {fileName ? fileName : 'Nenhum arquivo selecionado'}
+              </span>
+            </div>
           </div>
           <div style={styles.checkboxGroup}>
             <input type="checkbox" id="isResident" checked={isResident} onChange={e => setIsResident(e.target.checked)} />
@@ -161,10 +190,19 @@ const styles = {
   input: {
     padding: '0.75rem',
     borderRadius: '4px',
-    border: '1px solid #333',
+    border: '1px solid rgba(255, 255, 255, 0.2)',
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
     color: 'white',
     fontFamily: 'monospace',
+  },
+  fileUploadBtn: {
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    border: '1px solid rgba(255, 255, 255, 0.2)',
+    padding: '0.5rem 1rem',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    fontSize: '0.9rem',
+    transition: 'all 0.2s'
   },
   checkboxGroup: {
     display: 'flex',
