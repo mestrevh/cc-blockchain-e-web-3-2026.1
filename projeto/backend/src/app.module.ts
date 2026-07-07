@@ -1,7 +1,8 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
-import { BlockchainModule } from "./blockchain/blockchain.module";
 import { AlertsModule } from "./alerts/alerts.module";
+import { BlockchainModule } from "./blockchain/blockchain.module";
+import { IdentitiesModule } from "./identities/identities.module";
 
 @Module({
   imports: [
@@ -11,6 +12,9 @@ import { AlertsModule } from "./alerts/alerts.module";
     }),
     BlockchainModule,
     AlertsModule,
+    IdentitiesModule,
   ],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}

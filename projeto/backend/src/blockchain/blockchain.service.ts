@@ -2,6 +2,7 @@ import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { Contract, JsonRpcProvider, Wallet } from "ethers";
 import surveillanceAuditAbi from "./abi/SurveillanceAudit.json";
+import identityRegistryAbi from "./abi/IdentityRegistry.json";
 import { AlertRecord, RegisterAlertResult } from "./interfaces/alert-record.interface";
 
 /**
@@ -16,24 +17,28 @@ export class BlockchainService implements OnModuleInit {
 
   private provider: JsonRpcProvider;
   private wallet: Wallet;
-  private contract: Contract;
+  private auditContract: Contract;
+  private identityContract: Contract;
 
   constructor(private readonly configService: ConfigService) {}
 
   onModuleInit() {
     const rpcUrl = this.configService.get<string>("RPC_URL", "http://127.0.0.1:8545");
-    const contractAddress = this.configService.getOrThrow<string>("CONTRACT_ADDRESS");
+    const auditAddress = this.configService.getOrThrow<string>("CONTRACT_ADDRESS");
+    const identityAddress = this.configService.getOrThrow<string>("IDENTITY_REGISTRY_ADDRESS");
     const privateKey = this.configService.getOrThrow<string>("ADMIN_PRIVATE_KEY");
 
     this.provider = new JsonRpcProvider(rpcUrl);
     // A wallet de administracao assina TODAS as transacoes de escrita.
-    // E ela quem precisa estar autorizada (`authorizedSubmitters`) no
-    // contrato — na pratica, a mesma conta usada no deploy (Etapa 1).
     this.wallet = new Wallet(privateKey, this.provider);
-    this.contract = new Contract(contractAddress, surveillanceAuditAbi, this.wallet);
+    
+    // O Hardhat exporta o artefato completo com bytecode. O Ethers precisa da propriedade .abi
+    this.auditContract = new Contract(auditAddress, surveillanceAuditAbi.abi, this.wallet);
+    this.identityContract = new Contract(identityAddress, identityRegistryAbi.abi, this.wallet);
 
     this.logger.log(`Conectado ao no RPC em ${rpcUrl}`);
-    this.logger.log(`Contrato SurveillanceAudit em ${contractAddress}`);
+    this.logger.log(`Contrato SurveillanceAudit em ${auditAddress}`);
+    this.logger.log(`Contrato IdentityRegistry em ${identityAddress}`);
     this.logger.log(`Assinando transacoes com a conta ${this.wallet.address}`);
   }
 
@@ -48,14 +53,15 @@ export class BlockchainService implements OnModuleInit {
     timestamp: number,
     alertType: string,
     imageHash: string,
+    identityHash: string,
   ): Promise<RegisterAlertResult> {
-    const tx = await this.contract.registerAlert(cameraId, timestamp, alertType, imageHash);
+    const tx = await this.auditContract.registerAlert(cameraId, timestamp, alertType, imageHash, identityHash);
     const receipt = await tx.wait();
 
     const parsedEvent = receipt.logs
       .map((log: any) => {
         try {
-          return this.contract.interface.parseLog(log);
+          return this.auditContract.interface.parseLog(log);
         } catch {
           return null;
         }
@@ -74,6 +80,7 @@ export class BlockchainService implements OnModuleInit {
       timestamp: Number(args.timestamp),
       alertType: args.alertType,
       imageHash: args.imageHash,
+      identityHash: args.identityHash,
       registeredBy: args.registeredBy,
       blockTimestamp: Number(args.blockTimestamp),
       txHash: receipt.hash,
@@ -82,17 +89,17 @@ export class BlockchainService implements OnModuleInit {
   }
 
   async getAlert(id: number): Promise<AlertRecord> {
-    const raw = await this.contract.getAlert(id);
+    const raw = await this.auditContract.getAlert(id);
     return this.toAlertRecord(raw);
   }
 
   async getAllAlerts(): Promise<AlertRecord[]> {
-    const raw = await this.contract.getAllAlerts();
+    const raw = await this.auditContract.getAllAlerts();
     return raw.map((item: any) => this.toAlertRecord(item));
   }
 
   async getAlertsByCamera(cameraId: string): Promise<AlertRecord[]> {
-    const raw = await this.contract.getAlertsByCamera(cameraId);
+    const raw = await this.auditContract.getAlertsByCamera(cameraId);
     return raw.map((item: any) => this.toAlertRecord(item));
   }
 
@@ -104,8 +111,64 @@ export class BlockchainService implements OnModuleInit {
       timestamp: Number(raw.timestamp),
       alertType: raw.alertType,
       imageHash: raw.imageHash,
+      identityHash: raw.identityHash,
       registeredBy: raw.registeredBy,
       blockTimestamp: Number(raw.blockTimestamp),
     };
+  }
+
+  // --- Identity Registry Methods ---
+
+  /** Retorna todas as identidades cadastradas pela carteira especifica */
+  async getIdentitiesByWallet(walletAddress: string): Promise<any[]> {
+    const identityHashes = await this.identityContract.getIdentitiesByWallet(walletAddress);
+    
+    // Busca os dados completos para cada hash retornado
+    const identities = [];
+    for (const hash of identityHashes) {
+      const idData = await this.identityContract.getIdentity(hash);
+      identities.push({
+        identityHash: idData.identityHash,
+        nameHash: idData.nameHash,
+        docHash: idData.docHash,
+        photoHash: idData.photoHash,
+        role: Number(idData.role),
+        expiration: Number(idData.expiration),
+        registeredBy: idData.registeredBy,
+        createdAt: Number(idData.createdAt),
+      });
+    }
+    
+    return identities;
+  }
+
+  /**
+   * Envia uma transacao para cadastrar uma nova identidade.
+   */
+  async registerIdentity(
+    nameHash: string,
+    docHash: string,
+    photoHash: string,
+    isResident: boolean,
+  ): Promise<string> {
+    const tx = await this.identityContract.registerIdentity(nameHash, docHash, photoHash, isResident);
+    const receipt = await tx.wait();
+
+    // Extrai o identityHash do evento emitido
+    const parsedEvent = receipt.logs
+      .map((log: any) => {
+        try {
+          return this.identityContract.interface.parseLog(log);
+        } catch {
+          return null;
+        }
+      })
+      .find((event: any) => event?.name === "IdentityRegistered");
+
+    if (!parsedEvent) {
+      throw new Error("Transacao confirmada, mas o evento IdentityRegistered nao foi encontrado.");
+    }
+
+    return parsedEvent.args.identityHash;
   }
 }

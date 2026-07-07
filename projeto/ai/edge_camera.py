@@ -24,22 +24,65 @@ def generate_evidence_hash() -> str:
     dummy_image_data = f"frame_data_{uuid.uuid4()}".encode('utf-8')
     return hashlib.sha256(dummy_image_data).hexdigest()
 
+def fetch_registered_identities():
+    """
+    Consulta o Node RPC local (Hardhat) para pegar todos os eventos IdentityRegistered 
+    do contrato IdentityRegistry e extrair os identityHashes reais cadastrados.
+    """
+    rpc_url = "http://127.0.0.1:8545"
+    identity_registry_address = "0x5FbDB2315678afecb367f032d93F642f64180aa3"
+    
+    payload = {
+        "jsonrpc": "2.0",
+        "method": "eth_getLogs",
+        "params": [{
+            "address": identity_registry_address,
+            "fromBlock": "0x0",
+            "toBlock": "latest"
+        }],
+        "id": 1
+    }
+    
+    try:
+        response = requests.post(rpc_url, json=payload, timeout=5)
+        if response.status_code == 200:
+            result = response.json().get('result', [])
+            # topics[0] = Hash do Evento, topics[1] = Primeiro argumento indexado (identityHash)
+            hashes = [log['topics'][1] for log in result if len(log.get('topics', [])) > 1]
+            return hashes
+    except Exception as e:
+        logging.error(f"Erro ao buscar identidades registradas: {e}")
+    return []
+
 def detect_event() -> Dict[str, Any]:
     """
     Simula o processamento do modelo de IA embarcado na câmera
     para detecção de reconhecimento facial ou intrusão.
     """
-    event_types = ["PESSOA_NAO_AUTORIZADA", "MORADOR_RECONHECIDO", "PESSOA_AUTORIZADA"]
+    event_types = ["PESSOA_NAO_AUTORIZADA", "PESSOA_AUTORIZADA"]
     event_type = random.choice(event_types)
     timestamp = int(time.time())
     
     image_hash = generate_evidence_hash()
     
+    # Busca identidades reais da blockchain
+    real_identities = fetch_registered_identities()
+    
+    if real_identities and event_type != "PESSOA_NAO_AUTORIZADA":
+        # Sorteia uma identidade real registrada se for autorizado
+        identity_hash = random.choice(real_identities)
+    else:
+        # Se for não autorizado ou não tiver ninguem cadastrado, gera um dummy
+        dummy_identity_seed = f"identity_{random.randint(1, 5)}".encode('utf-8')
+        identity_hash = f"0x{hashlib.sha256(dummy_identity_seed).hexdigest()}"
+        event_type = "PESSOA_NAO_AUTORIZADA"
+    
     payload = {
         "cameraId": CAMERA_ID,
         "timestamp": timestamp,
         "alertType": event_type,
-        "imageHash": f"0x{image_hash}" # O Solidity espera bytes32 formatado como hexa 0x
+        "imageHash": f"0x{image_hash}", # O Solidity espera bytes32 formatado como hexa 0x
+        "identityHash": identity_hash
     }
     return payload
 

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useWallet } from '../contexts/WalletContext';
 
 const formatTimestamp = (unixSeconds) => {
   if (!unixSeconds) return 'N/A';
@@ -7,22 +8,50 @@ const formatTimestamp = (unixSeconds) => {
 };
 
 const AlertTable = () => {
+  const { account } = useWallet();
   const [alerts, setAlerts] = useState([]);
+  const [identities, setIdentities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    const fetchIdentities = async () => {
+      if (!account) return [];
+      try {
+        const response = await fetch(`http://localhost:3000/identities/wallet/${account}`);
+        if (response.ok) {
+          const data = await response.json();
+          const hashes = data.map(id => id.identityHash);
+          setIdentities(hashes);
+          return hashes;
+        }
+      } catch (e) {
+        console.error('Erro ao buscar identidades', e);
+      }
+      return [];
+    };
+
     const fetchAlerts = async (isBackgroundRefresh = false) => {
       try {
+        const userHashes = await fetchIdentities();
+
         const response = await fetch('http://localhost:3000/alerts');
         if (!response.ok) {
           throw new Error('Falha na resposta do servidor da API');
         }
         const data = await response.json();
+        
+        // Filtra os alertas para focar apenas nas identidades do usuario
+        // Se nao tiver carteira conectada, mostra todos os registros de forma publica
+        let filteredData = data;
+        if (account) {
+          filteredData = data.filter(alert => userHashes.includes(alert.identityHash));
+        }
+
         // Garante que os registros mais recentes (maior ID) fiquem no topo da tabela
-        const sortedData = data.sort((a, b) => b.id - a.id);
+        const sortedData = filteredData.sort((a, b) => b.id - a.id);
         setAlerts(sortedData);
-        setError(null); // Limpa o erro se a conexão voltar
+        setError(null);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -42,7 +71,7 @@ const AlertTable = () => {
 
     // Cleanup para evitar memory leak quando o componente for desmontado
     return () => clearInterval(intervalId);
-  }, []);
+  }, [account]);
 
   if (loading) {
     return (
@@ -80,7 +109,8 @@ const AlertTable = () => {
             <th>Câmera</th>
             <th>Momento (Borda)</th>
             <th>Tipo de Alerta</th>
-            <th>Hash (Evidência LGPD)</th>
+            <th>Hash Imagem (Evidência LGPD)</th>
+            <th>Hash Liberação (Evidência LGPD)</th>
             <th>Momento (Rede)</th>
           </tr>
         </thead>
@@ -97,6 +127,9 @@ const AlertTable = () => {
               </td>
               <td className="hash-cell" title={alert.imageHash}>
                 {alert.imageHash.substring(0, 10)}...{alert.imageHash.substring(58)}
+              </td>
+              <td className="hash-cell" title={alert.identityHash}>
+                {alert.identityHash.substring(0, 10)}...{alert.identityHash.substring(58)}
               </td>
               <td>{formatTimestamp(alert.blockTimestamp)}</td>
             </tr>

@@ -1,5 +1,6 @@
 :root {
   --bg-dark: #0f172a;
+  --bg-panel: #1e293b;
   --bg-card: rgba(30, 41, 59, 0.7);
   --text-main: #f8fafc;
   --text-muted: #94a3b8;
@@ -21,15 +22,6 @@ body {
   background-color: var(--bg-dark);
   color: var(--text-main);
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-.dashboard-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2rem;
-  width: 100%;
 }
 
 .header {

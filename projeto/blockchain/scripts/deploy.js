@@ -20,14 +20,22 @@ async function main() {
   const balance = await hre.ethers.provider.getBalance(deployer.address);
   console.log("Saldo da conta:", hre.ethers.formatEther(balance), "ETH");
 
-  const SurveillanceAudit = await hre.ethers.getContractFactory("SurveillanceAudit");
-  const contract = await SurveillanceAudit.deploy();
-  await contract.waitForDeployment();
 
-  const contractAddress = await contract.getAddress();
+  // 1. Deploy IdentityRegistry
+  const IdentityRegistry = await hre.ethers.getContractFactory("IdentityRegistry");
+  const identityContract = await IdentityRegistry.deploy();
+  await identityContract.waitForDeployment();
+  const identityAddress = await identityContract.getAddress();
+
+  // 2. Deploy SurveillanceAudit
+  const SurveillanceAudit = await hre.ethers.getContractFactory("SurveillanceAudit");
+  const auditContract = await SurveillanceAudit.deploy();
+  await auditContract.waitForDeployment();
+  const auditAddress = await auditContract.getAddress();
 
   console.log("\n=== Deploy concluido ===");
-  console.log("Contrato SurveillanceAudit implantado em:", contractAddress);
+  console.log("Contrato IdentityRegistry implantado em:", identityAddress);
+  console.log("Contrato SurveillanceAudit implantado em:", auditAddress);
   console.log("Owner / primeiro submitter autorizado:", deployer.address);
 
   // --- Automacao: Atualiza o .env do Backend ---
@@ -38,17 +46,24 @@ async function main() {
   if (fs.existsSync(envPath)) {
     let envContent = fs.readFileSync(envPath, "utf8");
     
-    // Substitui ou adiciona a variavel CONTRACT_ADDRESS
+    // Atualiza CONTRACT_ADDRESS
     if (envContent.includes("CONTRACT_ADDRESS=")) {
-      envContent = envContent.replace(/CONTRACT_ADDRESS=.*/g, `CONTRACT_ADDRESS=${contractAddress}`);
+      envContent = envContent.replace(/CONTRACT_ADDRESS=.*/g, `CONTRACT_ADDRESS=${auditAddress}`);
     } else {
-      envContent += `\nCONTRACT_ADDRESS=${contractAddress}\n`;
+      envContent += `\nCONTRACT_ADDRESS=${auditAddress}\n`;
+    }
+
+    // Atualiza IDENTITY_REGISTRY_ADDRESS
+    if (envContent.includes("IDENTITY_REGISTRY_ADDRESS=")) {
+      envContent = envContent.replace(/IDENTITY_REGISTRY_ADDRESS=.*/g, `IDENTITY_REGISTRY_ADDRESS=${identityAddress}`);
+    } else {
+      envContent += `\nIDENTITY_REGISTRY_ADDRESS=${identityAddress}\n`;
     }
     
     fs.writeFileSync(envPath, envContent);
-    console.log(`\n✅ Endereco do contrato copiado automaticamente para: ${envPath}`);
+    console.log(`\n✅ Enderecos dos contratos copiados automaticamente para: ${envPath}`);
   } else {
-    console.log("\n⚠️ Arquivo .env do backend nao encontrado. Copie manualmente o endereco (CONTRACT_ADDRESS).");
+    console.log("\n⚠️ Arquivo .env do backend nao encontrado. Copie manualmente os enderecos.");
   }
 }
 

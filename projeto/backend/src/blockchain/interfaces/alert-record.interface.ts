@@ -11,6 +11,7 @@ export interface AlertRecord {
   timestamp: number;
   alertType: string;
   imageHash: string;
+  identityHash: string;
   registeredBy: string;
   blockTimestamp: number;
 }
