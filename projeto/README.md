@@ -16,21 +16,13 @@ Esta arquitetura de 4 camadas foi construída visando resolver o problema de seg
 
 Para testar a arquitetura ponta a ponta localmente, você precisará abrir **4 terminais diferentes** e rodar os comandos a seguir em ordem.
 
-### Terminal 1: Simulando a Blockchain
-Nós precisamos de uma rede Ethereum local rodando para aceitar nossos contratos.
+### Terminal 1: Inicializando a Blockchain e o Deploy Automático
+Para facilitar, criamos um comando unificado que sobe a rede Ethereum local e já faz o deploy do contrato inteligente em seguida, tudo no mesmo terminal!
 ```bash
 cd projeto/blockchain
-npm i
-npx hardhat node
+npm run start
 ```
-*(Deixe este terminal aberto. Ele exibirá várias contas e chaves privadas falsas de teste. Copie uma chave privada "Account #0" para o `.env` do Backend caso necessário).*
-
-### Terminal 1.5: Fazendo o Deploy
-Abra uma NOVA ABA ou terminal, deixe o Terminal 1 rodando e faça o deploy:
-```bash
-cd projeto/blockchain
-npx hardhat run scripts/deploy.js --network localhost
-```
+*(Deixe este terminal aberto. Ele subirá o nó, aguardará 3 segundos e fará o deploy. O endereço do contrato será impresso na tela. Copie-o para o `.env` do Backend).*
 
 ### Terminal 2: Inicializando a API Backend
 O Backend é a ponte segura que possui acesso de escrita à blockchain. Verifique o arquivo `.env` para colocar os valores corretos ao fazer o deploy
