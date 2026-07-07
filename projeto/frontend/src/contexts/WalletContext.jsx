@@ -12,8 +12,8 @@ export const WalletProvider = ({ children }) => {
   const [isConnecting, setIsConnecting] = useState(false);
 
   useEffect(() => {
-    // Verifica se ja esta conectado ao recarregar a pagina
-    checkIfWalletIsConnected();
+    // Desabilitado a pedido: não auto-conectar ao carregar a página
+    // checkIfWalletIsConnected();
   }, []);
 
   const checkIfWalletIsConnected = async () => {
