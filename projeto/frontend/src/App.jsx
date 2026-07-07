@@ -6,7 +6,13 @@ import { WalletProvider, useWallet } from './contexts/WalletContext';
 
 const Sidebar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { account, disconnectWallet } = useWallet();
+
+  const handleDisconnect = () => {
+    disconnectWallet();
+    navigate('/');
+  };
 
   if (!account) return null; // Não mostra barra se não estiver logado
 
@@ -33,7 +39,7 @@ const Sidebar = () => {
         <div style={styles.walletAddress}>
           {account.substring(0, 6)}...{account.substring(38)}
         </div>
-        <button onClick={disconnectWallet} style={styles.logoutBtn}>Desconectar</button>
+        <button onClick={handleDisconnect} style={styles.logoutBtn}>Desconectar</button>
       </div>
     </aside>
   );
