@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useWallet } from '../contexts/WalletContext';
+import { ethers } from 'ethers';
 
 const IdentitiesList = () => {
   const { account } = useWallet();
   const [identities, setIdentities] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Form State
-  const [nameHash, setNameHash] = useState('');
-  const [docHash, setDocHash] = useState('');
-  const [photoHash, setPhotoHash] = useState('');
+  // Form State (Texto Claro)
+  const [name, setName] = useState('');
+  const [doc, setDoc] = useState('');
+  const [photo, setPhoto] = useState('');
   const [isResident, setIsResident] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -33,10 +34,19 @@ const IdentitiesList = () => {
     fetchIdentities();
   }, [account]);
 
+  const generateHash = (text) => {
+    return ethers.sha256(ethers.toUtf8Bytes(text));
+  };
+
   const handleRegister = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
+    
     try {
+      const nameHash = generateHash(name);
+      const docHash = generateHash(doc);
+      const photoHash = generateHash(photo);
+
       const response = await fetch('http://localhost:3000/identities', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -49,9 +59,9 @@ const IdentitiesList = () => {
       });
       if (response.ok) {
         alert('Identidade registrada com sucesso na Blockchain!');
-        setNameHash('');
-        setDocHash('');
-        setPhotoHash('');
+        setName('');
+        setDoc('');
+        setPhoto('');
         fetchIdentities(); // Refresh list
       } else {
         const errorData = await response.json();
@@ -75,16 +85,16 @@ const IdentitiesList = () => {
         <h3>Cadastrar Nova Identidade</h3>
         <form onSubmit={handleRegister} style={styles.form}>
           <div style={styles.inputGroup}>
-            <label>Name Hash (SHA-256 Hex)</label>
-            <input required type="text" value={nameHash} onChange={e => setNameHash(e.target.value)} placeholder="0x..." style={styles.input} />
+            <label>Nome Completo</label>
+            <input required type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Ex: João da Silva" style={styles.input} />
           </div>
           <div style={styles.inputGroup}>
-            <label>Document Hash (SHA-256 Hex)</label>
-            <input required type="text" value={docHash} onChange={e => setDocHash(e.target.value)} placeholder="0x..." style={styles.input} />
+            <label>Documento (CPF/RG)</label>
+            <input required type="text" value={doc} onChange={e => setDoc(e.target.value)} placeholder="Ex: 123.456.789-00" style={styles.input} />
           </div>
           <div style={styles.inputGroup}>
-            <label>Photo Hash (SHA-256 Hex)</label>
-            <input required type="text" value={photoHash} onChange={e => setPhotoHash(e.target.value)} placeholder="0x..." style={styles.input} />
+            <label>Evidência Fotográfica (URL ou Base64)</label>
+            <input required type="text" value={photo} onChange={e => setPhoto(e.target.value)} placeholder="URL ou dado da foto" style={styles.input} />
           </div>
           <div style={styles.checkboxGroup}>
             <input type="checkbox" id="isResident" checked={isResident} onChange={e => setIsResident(e.target.checked)} />
