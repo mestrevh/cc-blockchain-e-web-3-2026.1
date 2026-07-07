@@ -8,7 +8,6 @@ import { IsEnum, IsInt, IsNotEmpty, IsPositive, IsString, Matches, MaxLength } f
  */
 export enum AlertType {
   UNAUTHORIZED_PERSON = "PESSOA_NAO_AUTORIZADA",
-  RESIDENT_RECOGNIZED = "MORADOR_RECONHECIDO",
   AUTHORIZED_PERSON = "PESSOA_AUTORIZADA",
 }
 

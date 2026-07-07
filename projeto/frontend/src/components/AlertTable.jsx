@@ -109,7 +109,8 @@ const AlertTable = () => {
             <th>Câmera</th>
             <th>Momento (Borda)</th>
             <th>Tipo de Alerta</th>
-            <th>Hash (Evidência LGPD)</th>
+            <th>Hash Imagem (Evidência LGPD)</th>
+            <th>Hash Liberação (Evidência LGPD)</th>
             <th>Momento (Rede)</th>
           </tr>
         </thead>
@@ -126,6 +127,9 @@ const AlertTable = () => {
               </td>
               <td className="hash-cell" title={alert.imageHash}>
                 {alert.imageHash.substring(0, 10)}...{alert.imageHash.substring(58)}
+              </td>
+              <td className="hash-cell" title={alert.identityHash}>
+                {alert.identityHash.substring(0, 10)}...{alert.identityHash.substring(58)}
               </td>
               <td>{formatTimestamp(alert.blockTimestamp)}</td>
             </tr>

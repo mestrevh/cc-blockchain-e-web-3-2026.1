@@ -59,7 +59,7 @@ def detect_event() -> Dict[str, Any]:
     Simula o processamento do modelo de IA embarcado na câmera
     para detecção de reconhecimento facial ou intrusão.
     """
-    event_types = ["PESSOA_NAO_AUTORIZADA", "MORADOR_RECONHECIDO", "PESSOA_AUTORIZADA"]
+    event_types = ["PESSOA_NAO_AUTORIZADA", "PESSOA_AUTORIZADA"]
     event_type = random.choice(event_types)
     timestamp = int(time.time())
     
