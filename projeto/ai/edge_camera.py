@@ -35,11 +35,18 @@ def detect_event() -> Dict[str, Any]:
     
     image_hash = generate_evidence_hash()
     
+    # Simula um hash de identidade da pessoa reconhecida
+    # Na vida real, a IA tentaria combinar o rosto detectado com um banco local de hashes
+    # Se nao achar, geraria um novo (ou enviaria um dummy para pessoa nao autorizada)
+    dummy_identity_seed = f"identity_{random.randint(1, 5)}".encode('utf-8')
+    identity_hash = hashlib.sha256(dummy_identity_seed).hexdigest()
+    
     payload = {
         "cameraId": CAMERA_ID,
         "timestamp": timestamp,
         "alertType": event_type,
-        "imageHash": f"0x{image_hash}" # O Solidity espera bytes32 formatado como hexa 0x
+        "imageHash": f"0x{image_hash}", # O Solidity espera bytes32 formatado como hexa 0x
+        "identityHash": f"0x{identity_hash}"
     }
     return payload
 
