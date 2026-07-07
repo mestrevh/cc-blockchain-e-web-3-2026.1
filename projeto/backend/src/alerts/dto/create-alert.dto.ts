@@ -9,8 +9,7 @@ import { IsEnum, IsInt, IsNotEmpty, IsPositive, IsString, Matches, MaxLength } f
 export enum AlertType {
   UNAUTHORIZED_PERSON = "PESSOA_NAO_AUTORIZADA",
   RESIDENT_RECOGNIZED = "MORADOR_RECONHECIDO",
-  VEHICLE_DETECTED = "VEICULO_DETECTADO",
-  TAMPERING_DETECTED = "ADULTERACAO_DETECTADA",
+  AUTHORIZED_PERSON = "PESSOA_AUTORIZADA",
 }
 
 export class CreateAlertDto {

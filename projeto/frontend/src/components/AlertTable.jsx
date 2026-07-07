@@ -19,7 +19,9 @@ const AlertTable = () => {
           throw new Error('Falha na resposta do servidor da API');
         }
         const data = await response.json();
-        setAlerts(data);
+        // Garante que os registros mais recentes (maior ID) fiquem no topo da tabela
+        const sortedData = data.sort((a, b) => b.id - a.id);
+        setAlerts(sortedData);
         setError(null); // Limpa o erro se a conexão voltar
       } catch (err) {
         setError(err.message);
