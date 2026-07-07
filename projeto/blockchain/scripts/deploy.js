@@ -29,7 +29,27 @@ async function main() {
   console.log("\n=== Deploy concluido ===");
   console.log("Contrato SurveillanceAudit implantado em:", contractAddress);
   console.log("Owner / primeiro submitter autorizado:", deployer.address);
-  console.log("\nCopie o endereco acima para o .env do backend (CONTRACT_ADDRESS).");
+
+  // --- Automacao: Atualiza o .env do Backend ---
+  const fs = require("fs");
+  const path = require("path");
+  
+  const envPath = path.join(__dirname, "../../backend/.env");
+  if (fs.existsSync(envPath)) {
+    let envContent = fs.readFileSync(envPath, "utf8");
+    
+    // Substitui ou adiciona a variavel CONTRACT_ADDRESS
+    if (envContent.includes("CONTRACT_ADDRESS=")) {
+      envContent = envContent.replace(/CONTRACT_ADDRESS=.*/g, `CONTRACT_ADDRESS=${contractAddress}`);
+    } else {
+      envContent += `\nCONTRACT_ADDRESS=${contractAddress}\n`;
+    }
+    
+    fs.writeFileSync(envPath, envContent);
+    console.log(`\n✅ Endereco do contrato copiado automaticamente para: ${envPath}`);
+  } else {
+    console.log("\n⚠️ Arquivo .env do backend nao encontrado. Copie manualmente o endereco (CONTRACT_ADDRESS).");
+  }
 }
 
 main().catch((error) => {
