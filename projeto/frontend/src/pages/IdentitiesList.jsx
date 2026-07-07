@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useWallet } from '../contexts/WalletContext';
 import { ethers } from 'ethers';
+import identityRegistryAbi from '../abi/IdentityRegistry.json';
+
+const IDENTITY_REGISTRY_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 
 const IdentitiesList = () => {
-  const { account } = useWallet();
+  const { account, signer } = useWallet();
   const [identities, setIdentities] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -67,30 +70,28 @@ const IdentitiesList = () => {
       const docHash = generateHash(doc);
       const photoHash = generateHash(photoBase64);
 
-      const response = await fetch('http://localhost:3000/identities', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          nameHash,
-          docHash,
-          photoHash,
-          isResident
-        }),
-      });
-      if (response.ok) {
-        alert('Identidade registrada com sucesso na Blockchain!');
-        setName('');
-        setDoc('');
-        setPhotoBase64('');
-        setFileName('');
-        fetchIdentities(); // Refresh list
-      } else {
-        const errorData = await response.json();
-        alert(`Erro: ${errorData.message}`);
+      if (!signer) {
+        alert("Signer não encontrado. Carteira não está completamente conectada.");
+        return;
       }
+
+      // Conecta diretamente ao contrato através do MetaMask (Web3 nativo)
+      const contract = new ethers.Contract(IDENTITY_REGISTRY_ADDRESS, identityRegistryAbi.abi, signer);
+      
+      const tx = await contract.registerIdentity(nameHash, docHash, photoHash, isResident);
+      
+      alert('Transação enviada para o MetaMask! Aguardando confirmação da blockchain...');
+      await tx.wait(); // Espera o bloco ser minerado
+
+      alert('Identidade registrada com sucesso na Blockchain!');
+      setName('');
+      setDoc('');
+      setPhotoBase64('');
+      setFileName('');
+      fetchIdentities(); // Refresh list
     } catch (error) {
       console.error('Erro ao registrar:', error);
-      alert('Erro na comunicação com o servidor.');
+      alert('Erro na comunicação com a Blockchain ou transação rejeitada.');
     } finally {
       setIsSubmitting(false);
     }
