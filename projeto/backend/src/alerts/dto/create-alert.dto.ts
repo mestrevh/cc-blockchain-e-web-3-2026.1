@@ -29,8 +29,16 @@ export class CreateAlertDto {
   alertType: AlertType;
 
   /** Hash SHA-256 da evidencia, em hexadecimal (0x + 64 caracteres = 32 bytes). */
+  @IsNotEmpty()
   @Matches(/^0x[0-9a-fA-F]{64}$/, {
     message: "imageHash deve ser um hash SHA-256 em hexadecimal no formato 0x + 64 caracteres",
   })
   imageHash: string;
+
+  /** Hash do contrato/identidade da pessoa que gerou o alerta. Se nao for uma pessoa, um hash generico ou zero pode ser esperado dependendo da regra de negocio. */
+  @IsNotEmpty()
+  @Matches(/^0x[0-9a-fA-F]{64}$/, {
+    message: "identityHash deve ser um hash SHA-256 em hexadecimal",
+  })
+  identityHash: string;
 }

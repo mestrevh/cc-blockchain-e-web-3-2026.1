@@ -17,6 +17,7 @@ export class AlertsService {
         dto.timestamp,
         dto.alertType,
         dto.imageHash,
+        dto.identityHash,
       );
       this.logger.log(`Alerta #${result.id} registrado (tx ${result.txHash})`);
       return result;
