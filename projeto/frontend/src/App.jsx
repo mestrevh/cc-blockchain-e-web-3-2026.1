@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
 import AlertTable from './components/AlertTable';
 import IdentitiesList from './pages/IdentitiesList';
 import { WalletProvider, useWallet } from './contexts/WalletContext';
@@ -54,11 +54,18 @@ const ProtectedRoute = ({ children }) => {
 };
 
 function AppContent() {
-  const { account } = useWallet();
+  const { account, connectWallet } = useWallet();
+  const navigate = useNavigate();
+
+  const handleConnect = async () => {
+    await connectWallet();
+    // Verifica se conectou (ou espera state update, mas aqui forçamos o redirecionamento)
+    // Para ser mais seguro, o redirecionamento pode ocorrer independente, pois se falhar, o ProtectedRoute barra
+    navigate('/identities');
+  };
 
   return (
-    <BrowserRouter>
-      <div style={styles.layoutLoggedIn}>
+    <div style={account ? styles.layoutLoggedIn : styles.layoutLoggedOut}>
         <Sidebar />
         <main style={styles.main}>
           <header className="header" style={styles.header}>
@@ -70,7 +77,7 @@ function AppContent() {
             </div>
             {!account && (
               <button 
-                onClick={connectWallet}
+                onClick={handleConnect}
                 style={{
                   ...styles.logoutBtn,
                   backgroundColor: 'var(--accent)',
@@ -107,14 +114,15 @@ function AppContent() {
           </div>
         </main>
       </div>
-    </BrowserRouter>
   );
 }
 
 function App() {
   return (
     <WalletProvider>
-      <AppContent />
+      <BrowserRouter>
+        <AppContent />
+      </BrowserRouter>
     </WalletProvider>
   );
 }
@@ -123,6 +131,11 @@ const styles = {
   layoutLoggedIn: {
     display: 'grid',
     gridTemplateColumns: '250px 1fr',
+    minHeight: '100vh',
+  },
+  layoutLoggedOut: {
+    display: 'flex',
+    flexDirection: 'column',
     minHeight: '100vh',
   },
   sidebar: {
