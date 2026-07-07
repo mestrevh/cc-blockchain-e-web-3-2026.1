@@ -11,7 +11,7 @@ from typing import Dict, Any
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Configurações do ambiente Edge
-CAMERA_ID = "CAM-PORTARIA-01"
+CAMERAS = ["CAM-PORTARIA-01", "CAM-CORREDOR-02", "CAM-GARAGEM-03", "CAM-SALA-04", "CAM-JARDIM-05"]
 BACKEND_URL = "http://localhost:3000/alerts"
 
 def generate_evidence_hash() -> str:
@@ -78,7 +78,7 @@ def detect_event() -> Dict[str, Any]:
         event_type = "PESSOA_NAO_AUTORIZADA"
     
     payload = {
-        "cameraId": CAMERA_ID,
+        "cameraId": random.choice(CAMERAS),
         "timestamp": timestamp,
         "alertType": event_type,
         "imageHash": f"0x{image_hash}", # O Solidity espera bytes32 formatado como hexa 0x
@@ -112,7 +112,7 @@ def run_simulation() -> None:
     """
     Inicia o loop contínuo do simulador da câmera Edge.
     """
-    logging.info(f"Iniciando Simulador Câmera Edge: {CAMERA_ID}")
+    logging.info(f"Iniciando Simulador de Rede de Câmeras Edge: {', '.join(CAMERAS)}")
     logging.info("Hashes SHA-256 (conformidade LGPD) habilitados.")
     
     try:
