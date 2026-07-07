@@ -32,8 +32,9 @@ export class BlockchainService implements OnModuleInit {
     // A wallet de administracao assina TODAS as transacoes de escrita.
     this.wallet = new Wallet(privateKey, this.provider);
     
-    this.auditContract = new Contract(auditAddress, surveillanceAuditAbi, this.wallet);
-    this.identityContract = new Contract(identityAddress, identityRegistryAbi, this.wallet);
+    // O Hardhat exporta o artefato completo com bytecode. O Ethers precisa da propriedade .abi
+    this.auditContract = new Contract(auditAddress, surveillanceAuditAbi.abi, this.wallet);
+    this.identityContract = new Contract(identityAddress, identityRegistryAbi.abi, this.wallet);
 
     this.logger.log(`Conectado ao no RPC em ${rpcUrl}`);
     this.logger.log(`Contrato SurveillanceAudit em ${auditAddress}`);
