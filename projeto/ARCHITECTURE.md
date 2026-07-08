@@ -28,7 +28,15 @@ Em redes públicas baseadas na EVM (Ethereum Virtual Machine), o custo de armaze
 - **Uso do `bytes32`**: No Solidity, o hash SHA-256 é perfeitamente mapeado para o tipo `bytes32`. Em vez de usar `string` (que custa mais gás por ter tamanho dinâmico e exigir encoding pesado), forçamos o contrato a aceitar `bytes32`. Isso reduz significativamente as taxas de transação da administradora do condomínio.
 - **Custom Errors**: Utilizou-se a syntax `error NotAuthorized()` do Solidity nativo ao invés de strings longas em `require()`, economizando gás precioso na validação do controle de acesso.
 
-## 4. Diagrama de Fluxo de Dados (Data Flow)
+## 4. Cadastro de Identidades (Web3 Nativo)
+
+A plataforma utiliza o contrato `IdentityRegistry.sol` para gerenciar os hashes das identidades autorizadas. Diferente da auditoria de câmeras (onde o Backend atua como um *relayer* de alta velocidade), **o cadastro de identidades é feito de forma 100% descentralizada (Web3 Native)**.
+
+A aplicação React (Frontend) interage diretamente com o nó RPC usando `ethers.js` e a **MetaMask** do administrador. Isso garante que:
+- O atributo `msg.sender` no contrato inteligente reflete a verdadeira carteira do síndico que autorizou a pessoa, e não um servidor centralizado.
+- O sistema de AI (Python) na borda pode consultar os eventos públicos deste contrato (via `eth_getLogs`) para alimentar seu banco local de hashes conhecidos sem depender de bancos de dados.
+
+## 5. Diagrama de Fluxo de Dados (Data Flow)
 
 ```mermaid
 sequenceDiagram
@@ -36,20 +44,25 @@ sequenceDiagram
     participant API as Backend API (NestJS)
     participant BC as Blockchain (Hardhat/EVM)
     participant UI as Frontend UI (React)
-
-    Note over Cam: 1. Evento Físico Detectado<br/>(ex: Invasão)
-    Cam->>Cam: 2. Gera Hash SHA-256 da Imagem
-    Cam->>API: 3. POST /alerts (JSON Metadados + Hash)
+    Note over UI: 1. Cadastro de Morador (React UI)
+    UI->>BC: 2. Assina e envia TX direto via MetaMask (IdentityRegistry)
+    BC-->>UI: 3. Confirmação do Hash da Identidade
     
-    Note over API: Valida Payload e Assina Transação<br/>(com Chave Privada do Admin)
-    API->>BC: 4. tx = SurveillanceAudit.logAlert(cameraId, timestamp, type, hash)
-    BC-->>API: 5. Confirmação (Tx Hash)
+    Note over Cam: 4. Evento Físico Detectado<br/>(ex: Invasão)
+    Cam->>BC: 5. RPC (eth_getLogs) busca Hashes Autorizados
+    BC-->>Cam: Retorna Hashes Reais
+    Cam->>Cam: 6. Gera Hash SHA-256 da Imagem da Câmera
+    Cam->>API: 7. POST /alerts (JSON Metadados + Hashes)
+    
+    Note over API: Valida Payload e Assina Transação<br/>(Relayer / Chave Privada do Admin)
+    API->>BC: 8. tx = SurveillanceAudit.registerAlert(...)
+    BC-->>API: 9. Confirmação (Tx Hash)
     API-->>Cam: 201 Created
     
-    Note over UI: Auditor (Síndico) abre o Painel
-    UI->>API: 6. GET /alerts
-    API->>BC: 7. Lê mapeamentos ou eventos de log
+    Note over UI: Auditor (Síndico) abre o Painel Geral
+    UI->>API: 10. GET /alerts
+    API->>BC: 11. Lê mapeamentos do SurveillanceAudit
     BC-->>API: Retorna Array de Alertas
     API-->>UI: Retorna JSON consolidado
-    UI->>UI: 8. Renderiza Tabela Imutável
+    UI->>UI: 12. Renderiza Tabela Imutável cruzada com Identidades
 ```
