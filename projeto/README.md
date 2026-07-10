@@ -1,6 +1,6 @@
-# Plataforma de Auditoria de Vigilância Web3 (Condomínios)
+# Smart Surveillance (Condomínios)
 
-Bem-vindo ao repositório do Projeto Final de Blockchain 2026.1.
+Bem-vindo ao repositório do Smart Surveillance.
 Esta arquitetura de 4 camadas foi construída visando resolver o problema de segurança física e auditoria de registros sensíveis usando a imutabilidade descentralizada.
 
 ## Estrutura das Camadas
@@ -45,7 +45,7 @@ uv run edge_camera.py
 ```
 *(Você verá logs da rede de câmeras (01 a 05). A IA buscará os hashes das identidades reais cadastradas na blockchain e acionará o backend de forma realista!).*
 
-### Terminal 4: Painel Administrativo de Auditoria (React UI)
+### Terminal 4: Painel Smart Surveillance (React UI)
 Finalmente, o síndico quer visualizar a tabela imutável.
 ```bash
 cd projeto/frontend

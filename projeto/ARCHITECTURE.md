@@ -1,4 +1,4 @@
-# Arquitetura de Auditoria Imutável (Web3 / Segurança)
+# Arquitetura do Smart Surveillance
 
 Este documento justifica as decisões arquiteturais da plataforma de vigilância baseada em Blockchain.
 
