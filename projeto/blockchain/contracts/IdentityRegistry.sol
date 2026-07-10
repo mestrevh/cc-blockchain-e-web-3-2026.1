@@ -3,7 +3,7 @@ pragma solidity 0.8.26;
 
 /**
  * @title IdentityRegistry
- * @author Projeto Academico - Blockchain e Web3
+ * @author Smart Surveillance
  * @notice Contrato para cadastro de moradores e visitantes, respeitando a LGPD 
  *         ao armazenar apenas os hashes (SHA-256) das informacoes pessoais.
  */

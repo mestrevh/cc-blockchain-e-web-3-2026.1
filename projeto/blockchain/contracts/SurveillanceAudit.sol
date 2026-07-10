@@ -3,7 +3,7 @@ pragma solidity 0.8.26;
 
 /**
  * @title SurveillanceAudit
- * @author Projeto Academico - Blockchain e Web3 2026.1
+ * @author Smart Surveillance
  * @notice Livro-caixa imutavel de auditoria para alertas de um sistema de
  *         vigilancia com reconhecimento facial em condominios.
  *

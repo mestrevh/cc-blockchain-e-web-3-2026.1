@@ -29,10 +29,10 @@ const Sidebar = () => {
   return (
     <aside style={styles.sidebar}>
       <div style={styles.logo}>
-        <h2 style={{ fontSize: '1.2rem', margin: 0 }}>Shield<span style={{color: 'var(--accent)'}}>Chain</span></h2>
+        <h2 style={{ fontSize: '1.2rem', margin: 0 }}>Smart<span style={{color: 'var(--accent)'}}>Surveillance</span></h2>
       </div>
       <nav style={styles.nav}>
-        <Link to="/" style={navItemStyle('/')}>Auditoria Geral</Link>
+        <Link to="/" style={navItemStyle('/')}>Smart Surveillance</Link>
         <Link to="/identities" style={navItemStyle('/identities')}>Gerir Identidades</Link>
       </nav>
       <div style={styles.walletInfo}>
@@ -75,8 +75,8 @@ function AppContent() {
         <Sidebar />
         <main style={styles.main}>
           <header className="header" style={styles.header}>
-            <div>
-              <h1>Auditoria Imutável</h1>
+            <div style={styles.headerLeft}>
+              <h1>Smart Surveillance</h1>
               <p style={{ color: 'var(--text-muted)', marginTop: '0.5rem' }}>
                 Painel Administrativo de Segurança - Registros em Blockchain
               </p>
